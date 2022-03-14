@@ -4,5 +4,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.web.vue.dao.BoardDao">
-
+ 	<select id="getTot" resultType="int" parameterType="boardsch">
+ 		SELECT count(*)
+		FROM board
+		WHERE 1=1
+		<if test="title!=null">
+		AND title LIKE '%'||#{title}||'%'
+		</if>
+		<if test="writer!=null">
+		AND writer LIKE '%'||#{writer}||'%'	
+		</if>
+ 	</select>
+ 	<select id="getList" resultType="board" parameterType="boardsch">
+ 		SELECT *
+ 		FROM (
+		 	SELECT rownum cnt, LEVEL, a.* 
+			FROM board a
+			WHERE 1=1
+			<if test="title!=null">
+			AND title LIKE '%'||#{title}||'%'
+			</if>
+			<if test="writer!=null">
+			AND writer LIKE '%'||#{writer}||'%'	
+			</if>
+			START WITH refno=0 
+			CONNECT BY PRIOR NO=refno 
+			ORDER siblings BY NO DESC )
+		WHERE cnt BETWEEN #{start} AND #{end}
+ 	</select>
 </mapper>
